@@ -1,0 +1,147 @@
+window.[_ModelType_]ProfileForm = Dashboard.View.extend({
+	modelType : [_ModelType_],
+	exceptionHandler : ExceptionHandlingController.getInstance(),
+	fieldIds : [[_FieldIDs_]],
+	requiredFields : [[_RequiredFields_]],
+	/**
+	 * Update the model class, to have the value if the fields on the form.
+	 */
+	attachFieldValueToModel : function () {
+		try {
+		} catch (exception) {
+			this.exceptionHandler.handleException(exception);
+		}
+	},
+	/**
+	 * This function is called prior to saving an existing model data.
+	 * It ensures that the model doesn't have any legacy data.
+	 */
+	cleanModel : function () {
+		try {
+			this.model = new [_ModelType_]();
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+		}
+	},
+	/**
+	 * Closes the form
+	 */
+	close : function () {
+		try {
+			dashboardApp.navigate("", {trigger: true});
+			$(this.el).dialog('destroy').remove();
+			$(this.el).dialog( "close" );
+		} catch (exception) {
+			this.exceptionHandler.handleException(exception);
+		}
+	}
+	/**
+	 * All event handlers go here
+	 */
+	events: {
+		"click .ui-icon": "close",
+	},
+	/**
+	 * Handles the Rendering of the Form
+	 */
+	render : function () {
+		var thisPointer = this;
+		try {
+			$(this.el).html(this.template({
+				model : this.model,
+				//Rest of the properties that you wish to pass to template.
+			}));
+		} catch (exception) {
+			this.exceptionHandler.handleException(exception);
+		}
+	},
+	/**
+	 * First function to be called when we wish to bring up the form.
+	 */
+	initialize : function(){
+		try {
+			_.bindAll(this,"render");
+			this.template =_.template(tpl.get('[_HTMLTemplateFileName_]')); 
+			this.constructor.__super__.constructor.prototype.initialize.call(this);
+			this.render();
+		} catch (exception) {
+			this.exceptionHandler.handleException(exception);
+		}
+	},
+	/**
+	 * Is executed when you click the save button on your form.
+	 */
+	save: function() {
+		try {
+			if(this.validate ()) {
+				if (!this.isNew) {//To Test if this is a new object or an old one
+					this.cleanModel();
+				}
+				this.attachFieldValueToModel();
+				
+				$(this.el).dialog('destroy').remove();
+				$(this.el).dialog( "close" );
+
+				if (this.isNew) {
+					this.model.urlParams["command"] = "add";
+				} else {
+					this.model.urlParams["command"] = "update";
+				}
+				this.model.save({}, {
+					success : function (prm_objModel, prm_objResponse) {
+						dashboardApp.navigate("", {trigger: true});
+					},
+					error : function (prm_objModel, prm_objResponse) {
+						console.log ('Can not save changes');
+					}
+				});
+			}
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+		}
+	},
+	/**
+	 * Place all your form validation logic here.
+	 */
+	validate : function () {
+		var v_Return = true;
+		try {
+			v_Return = this.validateRequiredFields();
+			//TODO : All the other field validation code goes here.
+		} catch (exception) {
+			this.exceptionHandler.handleException(exception);
+		}
+		return v_Return;
+	},
+	/**
+	 * Checks is all the Required fields are filed or not.
+	 */
+	validateRequiredFields : function () {
+		var v_Return = true;
+		var v_sValue = null;
+		var v_sField = null;
+		var v_ctlControlToTest = null;
+		var v_arrRequiredFields = null;
+		try {
+			v_arrRequiredFields = this.requiredFields;
+			while (v_sField = v_arrRequiredFields.pop()) {
+				v_ctlControlToTest = $(this.el).find("#" + v_sField);
+				v_sValue = v_ctlControlToTest.val();
+				if ("" === v_sValue || null === v_sValue || "undefined" == v_sValue) {
+					switch (v_sField) {
+					//TODO : Any special cases go here.
+					default:
+						showError (v_ctlControlToTest, 'Please enter a "' + $("[for='" + v_sField + "']").text().replace("*", "") + '".');
+						break;
+					}
+					v_Return = false;
+					// break; // Don't break it, let the user know all the un-filled fields.
+				}
+			}
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+			v_Return = false;
+		}
+		return v_Return;
+	},
+});

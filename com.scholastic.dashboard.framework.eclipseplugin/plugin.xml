@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<extension point="org.eclipse.ui.newWizards">
+		<category name="SAM Dashboard" id="com.scholastic.dashboard.framework.eclipseplugin" />
+		<wizard
+			name="Add View"
+			icon="icons/sample.gif"
+			category="com.scholastic.dashboard.framework.eclipseplugin"
+			class="com.scholastic.dashboard.framework.eclipseplugin.wizards.DashboardViewWizard"
+			id="com.scholastic.dashboard.framework.eclipseplugin.wizards.DashboardViewWizard">
+		</wizard>
+	</extension>
+</plugin>

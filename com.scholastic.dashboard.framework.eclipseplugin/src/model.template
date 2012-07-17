@@ -1,0 +1,156 @@
+/**
+ * [_ModelType_]
+ * Base class for defining all the basic client-side Student Model specific code. Extend the Dashboard.Model class.
+ */
+window.[_ModelType_] = Dashboard.Model.extend({
+	exceptionHandler : ExceptionHandlingController.getInstance(),
+
+	/**
+	 * Loads the [_ModelType_] Data in "this" object with the data corresponding to the [_ModelType_]ID passed.
+	 */
+	loadDataById : function (prm_s[_ModelType_]Id, prm_fnCallBackFunction) {
+		var v_ptrThisPointer;
+		var v_objSlms[_ModelType_]SearchCollection;
+		try {
+			v_ptrThisPointer = this;
+			SlmsStudentSearchCollection = Backbone.Collection.extend({
+				model : v_ptrThisPointer,
+				parse : function (prm_xmlXMLDataToLoad) {v_ptrThisPointer.parse(prm_xmlXMLDataToLoad);}
+			});
+			if (window.Slms[_ModelType_]SearchCollection) {
+				v_objSlms[_ModelType_]SearchCollection = new Slms[_ModelType_]SearchCollection();
+				v_objSlms[_ModelType_]SearchCollection.fetch ({
+					dataType: "xml",
+					//TODO : Enter the correct credentials below
+					//url: "/slms/Slms[_ModelType_]?" + $.param({command : "get_profile", user_id : prm_s[_ModelType_]Id}),
+					success: function (prm_objModel, prm_sServerResponse) {
+						prm_fnCallBackFunction();
+					},
+					error : function (prm_sServerResponse) {
+						console.log("Failed to fetch the [_ModelType_] information. Possible causes: <ol><li>Network is down.</li><li>Server is down</li></ol>");
+					}
+				});
+			} else {
+				//TODO : Fetch code goes here.
+			}
+
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+			v_Return = null;
+		}
+	},
+	/**
+	 * Parses the Data sent as the parameter and populates the "this" object with the relevant information.
+	 */
+	parse : function (prm_xmlXMLDataToLoad) {
+		var v_iI = 0;
+		var v_sValue;
+		var v_arrAttributeIds;
+		var v_fnFindFunction;
+		try {
+			if (null == prm_xmlXMLDataToLoad) {
+				return;
+			}
+			v_fnFindFunction = $(prm_xmlXMLDataToLoad);
+			v_arrValueFieldIds = [[_FieldIDs_]];
+			for (v_iI = 0; v_iI < v_arrValueFieldIds.length; v_iI++) {
+				v_sValue = v_fnFindFunction.find(v_arrValueFieldIds[v_iI]).text();
+				this.set(v_arrValueFieldIds[v_iI], v_sValue);
+			}
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+		}
+	},
+	/**
+	 * Convert [_ModelType_] to XML. This representation would be used by the server to persist the data.
+	 * The SAM XML representation is as follows:
+[_Command_]
+	 *======================================================================================
+	 *	- Do not try-n-create String here (though it will work), since you would have to then do XML data validation yourself.
+	 *======================================================================================
+	 *	- To track the XML of any such form/command:
+	 *		1. Go to the Flash SAM.
+	 *		2. Login
+	 *		3. Press Command+Shift+6 to turn on the debug mode.
+	 *		4. Perform the operation : add/save whatever
+	 *		5. You should be able to get the XML.
+	 */
+
+	toXML : function() {
+		var v_Return = null;
+		var v_iI = 0;
+		var v_xmlNode = null;
+		var v_arrUserTags = null;
+		try {
+			v_xmlNode = createXmlFrag("user");//TODO : Replace the top level tag
+
+			v_arrUserTags = [[_FieldIDs_]];
+
+			for (v_iI = 0; v_iI < v_arrUserTags.length; v_iI++) {
+				addXmlField(v_xmlNode, v_arrUserTags[v_iI], this.get(v_arrUserTags[v_iI]));
+			}
+
+			v_Return = v_xmlNode;
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+			v_Return = null;
+		}
+		return v_Return;
+	},
+
+	/*
+	 * save
+	 * Performs the Save operation on the Current Model.
+	 */
+	save : function(prm_arrAttributes, prm_hOptions) {
+		var v_xmlData;
+		var v_ptrThisPointer;
+		try {
+			v_ptrThisPointer = this;
+			v_xmlData = this.toXML();
+			//the code below checks whether we constructed our xml for < ie9
+			if (v_xmlData.xml) {
+				v_xmlData = v_xmlData.xml;
+			}
+
+			if (!prm_hOptions)  {
+				prm_hOptions = {};
+			}
+			prm_hOptions = _.extend(prm_hOptions, {
+				dataType : 'xml',
+				data : v_xmlData,
+				contentType : "application/xml",
+				cache : false,
+				url : this.url(),
+				success : function (model, response) {
+					console.log('[_ModelType_] saved successfully.');
+				},
+				error : function (response) {
+					alert("Failed to save [_ModelType_] information.");
+				}
+			});
+			Backbone.sync("create", this, prm_hOptions);
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+		}
+	},
+
+	/*
+	 * url
+	 * Defines the communication path between JavaScript client and the SAM command server.
+	 */
+	url : function () {
+		var v_Return = null;
+		try {
+			//TODO : Specify the correct URL
+		} catch (v_exException) {
+			this.exceptionHandler.handleException(v_exException);
+		}
+		return v_Return;
+	},
+	/*
+	 * urlParams : Defines the basic Paramters that would be used while doing POST to the SAM server.
+	 */
+	urlParams : {command: "update"}
+	
+});
