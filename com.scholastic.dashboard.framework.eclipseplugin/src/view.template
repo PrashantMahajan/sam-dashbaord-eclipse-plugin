@@ -34,7 +34,7 @@ window.[_ModelType_]ProfileForm = Dashboard.View.extend({
 		} catch (exception) {
 			this.exceptionHandler.handleException(exception);
 		}
-	}
+	},
 	/**
 	 * All event handlers go here
 	 */
@@ -51,6 +51,29 @@ window.[_ModelType_]ProfileForm = Dashboard.View.extend({
 				model : this.model,
 				//Rest of the properties that you wish to pass to template.
 			}));
+			$(this.el).dialog ({
+				autoOpen: true,
+				title: 'New [_ModelType_]',
+				width: 510,
+				modal: true,
+				closeOnEscape: true,
+				open: function (event, ui) {
+				},
+
+				close: function() {
+					thisPointer.close();
+				},
+
+				buttons: {
+					Save : function() {
+						thisPointer.save();
+					},
+					Cancel: function() {
+						thisPointer.close();
+					}
+				}
+			});
+			this.delegateEvents(this.events);
 		} catch (exception) {
 			this.exceptionHandler.handleException(exception);
 		}
@@ -61,7 +84,7 @@ window.[_ModelType_]ProfileForm = Dashboard.View.extend({
 	initialize : function(){
 		try {
 			_.bindAll(this,"render");
-			this.template =_.template(tpl.get('[_HTMLTemplateFileName_]')); 
+			this.template =_.template(dashboardApp.getTemplate('[_HTMLTemplateFileName_]')); 
 			this.constructor.__super__.constructor.prototype.initialize.call(this);
 			this.render();
 		} catch (exception) {
