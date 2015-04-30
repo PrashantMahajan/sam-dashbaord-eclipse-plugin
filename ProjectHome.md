@@ -1,0 +1,1 @@
+This project helps the SAM Dashboard team to templatize the basic components.
